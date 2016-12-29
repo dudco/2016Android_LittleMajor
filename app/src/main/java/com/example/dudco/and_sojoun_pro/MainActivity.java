@@ -29,38 +29,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bubble = new Bubble(this);
-
-        BitmapDrawable drawable = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            drawable = (BitmapDrawable) getResources().getDrawable(R.drawable.mj, getTheme());
-        }
-        Bitmap bitmap = drawable.getBitmap();
-        bubble.setImageBitmap(bitmap);
-        bubble.setWindowManager((WindowManager) getSystemService(WINDOW_SERVICE));
+        BubbleManager.getInstance().init(getApplicationContext());
 
         findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (canDrawOverlays(MainActivity.this)){
-                    if(!bubble.isRunning())
-                        bubble.addBubble();
+                if (Util.canDrawOverlays(MainActivity.this)){
+                    if(!BubbleManager.getInstance().isSowing())
+                        BubbleManager.getInstance().addBubble();
                     else
-                        bubble.removeBubble();
+                        BubbleManager.getInstance().removeBubble();
+//                    else
+//                        bubble.removeBubble();
                 }else{
                     requestPermission(OVERAY_REQ_PERMISSION);
                 }
             }
         });
-    }
-
-    public static boolean canDrawOverlays(Context context){
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }else{
-            return Settings.canDrawOverlays(context);
-        }
     }
 
     public void requestPermission(int requestCode){
@@ -75,10 +61,10 @@ public class MainActivity extends AppCompatActivity {
         if(resultCode == RESULT_OK){
             switch (requestCode){
                 case OVERAY_REQ_PERMISSION:{
-                    if(!canDrawOverlays(this)){
+                    if(!Util.canDrawOverlays(this)){
                         Toast.makeText(this, "권한 설정이 필요합니다!", Toast.LENGTH_SHORT).show();
                     }else{
-                        bubble.addBubble();
+                        BubbleManager.getInstance().addBubble();
                     }
                 }
             }
